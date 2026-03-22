@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
-import { LayoutDashboard, Dumbbell, BookOpen, BarChart3, Settings as SettingsIcon, History } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, BookOpen, BarChart3, Settings as SettingsIcon, History, Brain } from 'lucide-react';
 import { Dashboard } from './pages/Dashboard';
 import { Session } from './pages/Session';
 import { Problems } from './pages/Problems';
@@ -7,6 +7,7 @@ import { ProblemDetail } from './pages/ProblemDetail';
 import { Progress } from './pages/Progress';
 import { SessionHistory } from './pages/SessionHistory';
 import { Settings } from './pages/Settings';
+import { PatternTrainer } from './pages/PatternTrainer';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             <div className="flex items-center gap-1">
               <NavItem to="/" icon={<LayoutDashboard size={18} />} label="Dashboard" />
               <NavItem to="/session" icon={<Dumbbell size={18} />} label="Practice" />
+              <NavItem to="/patterns" icon={<Brain size={18} />} label="Patterns" />
               <NavItem to="/problems" icon={<BookOpen size={18} />} label="Problems" />
               <NavItem to="/progress" icon={<BarChart3 size={18} />} label="Progress" />
               <NavItem to="/history" icon={<History size={18} />} label="History" />
@@ -38,6 +40,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/session" element={<Session />} />
+            <Route path="/patterns" element={<PatternTrainer />} />
             <Route path="/problems" element={<Problems />} />
             <Route path="/problems/:id" element={<ProblemDetail />} />
             <Route path="/progress" element={<Progress />} />

@@ -21,7 +21,7 @@ import { HintLadder } from '../components/HintLadder';
 import { DifficultyBadge } from '../components/DifficultyBadge';
 import { PatternTag } from '../components/PatternTag';
 
-type SessionPhase = 'config' | 'solving' | 'rating' | 'insight' | 'summary';
+type SessionPhase = 'config' | 'solving' | 'rating' | 'insight' | 'complexity' | 'summary';
 
 export function Session() {
   const navigate = useNavigate();
@@ -33,6 +33,8 @@ export function Session() {
   const [solvedCorrectly, setSolvedCorrectly] = useState<boolean | null>(null);
   const [selectedQuality, setSelectedQuality] = useState<number | null>(null);
   const [insight, setInsight] = useState('');
+  const [timeComplexity, setTimeComplexity] = useState('');
+  const [spaceComplexity, setSpaceComplexity] = useState('');
   const [results, setResults] = useState<
     { problem: SessionProblem; quality: number; timeSpent: number; hintsUsed: number }[]
   >([]);
@@ -136,6 +138,8 @@ export function Session() {
       setSolvedCorrectly(null);
       setSelectedQuality(null);
       setInsight('');
+      setTimeComplexity('');
+      setSpaceComplexity('');
       startTimeRef.current = Date.now();
     } else {
       // Save session record
@@ -574,6 +578,45 @@ export function Session() {
             </div>
 
             <button
+              onClick={() => setPhase('complexity')}
+              className="btn-primary w-full flex items-center justify-center gap-2"
+            >
+              <ChevronRight size={18} />
+              Next: Complexity Analysis
+            </button>
+          </div>
+        )}
+
+        {/* Complexity Analysis */}
+        {phase === 'complexity' && (
+          <div className="space-y-4 pt-4 border-t border-gray-800">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                What's the time and space complexity?
+              </label>
+              <p className="text-xs text-gray-500 mb-3">
+                Interviewers almost always ask this. Practice articulating it.
+              </p>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1.5">Time Complexity</label>
+                  <ComplexitySelector
+                    value={timeComplexity}
+                    onChange={setTimeComplexity}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1.5">Space Complexity</label>
+                  <ComplexitySelector
+                    value={spaceComplexity}
+                    onChange={setSpaceComplexity}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <button
               onClick={submitReview}
               className="btn-primary w-full flex items-center justify-center gap-2"
             >
@@ -622,4 +665,50 @@ function QualityIcon({ quality }: { quality: number }) {
   if (quality >= 4) return <CheckCircle2 size={18} className="text-green-500" />;
   if (quality >= 3) return <CheckCircle2 size={18} className="text-amber-500" />;
   return <XCircle size={18} className="text-red-500" />;
+}
+
+const commonComplexities = [
+  'O(1)',
+  'O(log n)',
+  'O(n)',
+  'O(n log n)',
+  'O(n²)',
+  'O(n³)',
+  'O(2ⁿ)',
+  'O(n!)',
+];
+
+function ComplexitySelector({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-1.5">
+        {commonComplexities.map((c) => (
+          <button
+            key={c}
+            onClick={() => onChange(c)}
+            className={`px-2.5 py-1 rounded text-xs font-mono font-medium border transition-colors ${
+              value === c
+                ? 'bg-blue-600 border-blue-500 text-white'
+                : 'bg-gray-950 border-gray-700 text-gray-400 hover:border-gray-600'
+            }`}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="or type custom..."
+        className="w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-sm font-mono text-gray-200 placeholder-gray-600 focus:outline-none focus:border-gray-600 transition-colors"
+      />
+    </div>
+  );
 }
