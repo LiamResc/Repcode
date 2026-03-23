@@ -20,6 +20,7 @@ import { Timer } from '../components/Timer';
 import { HintLadder } from '../components/HintLadder';
 import { DifficultyBadge } from '../components/DifficultyBadge';
 import { PatternTag } from '../components/PatternTag';
+import { PatternSpoiler } from '../components/PatternSpoiler';
 
 type SessionPhase = 'config' | 'solving' | 'rating' | 'insight' | 'complexity' | 'summary';
 
@@ -470,9 +471,9 @@ export function Session() {
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <DifficultyBadge difficulty={currentProblem.problem.difficulty} size="md" />
-              {!isMockInterview && currentProblem.problem.patterns.map((p) => (
-                <PatternTag key={p} pattern={p} size="md" />
-              ))}
+              {!isMockInterview && (
+                <PatternSpoiler patterns={currentProblem.problem.patterns} size="md" />
+              )}
               {!isMockInterview && (
                 <span
                   className={`text-xs px-2 py-0.5 rounded-full ${
