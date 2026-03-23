@@ -12,6 +12,7 @@ import {
 import { getSessionHistory } from '../engine/storage';
 import { problems } from '../data/problems';
 import { format, formatDistanceToNow } from 'date-fns';
+import { getQualityLabel, getQualityColor } from '../engine/quality';
 
 export function SessionHistory() {
   const navigate = useNavigate();
@@ -120,7 +121,7 @@ export function SessionHistory() {
                   </div>
                   <div className="flex items-center gap-1.5 text-gray-400">
                     <TrendingUp size={14} />
-                    Q{(session.avgQuality * 2).toFixed(1)}
+                    {(session.avgQuality * 2).toFixed(1)}/10
                   </div>
                 </div>
               </div>
@@ -158,16 +159,8 @@ export function SessionHistory() {
                           </span>
                         )}
                         <span>{Math.floor(sp.timeSpent / 60)}m</span>
-                        <span
-                          className={`font-mono font-medium ${
-                            sp.quality >= 4
-                              ? 'text-green-400'
-                              : sp.quality >= 3
-                              ? 'text-amber-400'
-                              : 'text-red-400'
-                          }`}
-                        >
-                          Q{sp.quality * 2}
+                        <span className={`font-medium ${getQualityColor(sp.quality)}`}>
+                          {getQualityLabel(sp.quality)}
                         </span>
                       </div>
                     </div>

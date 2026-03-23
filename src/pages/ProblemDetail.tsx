@@ -19,6 +19,7 @@ import { PatternTag } from '../components/PatternTag';
 import { PatternSpoiler } from '../components/PatternSpoiler';
 import { MasteryIndicator } from '../components/MasteryIndicator';
 import { formatDistanceToNow, format } from 'date-fns';
+import { getQualityLabel, getQualityColor } from '../engine/quality';
 
 export function ProblemDetail() {
   const { id } = useParams<{ id: string }>();
@@ -226,16 +227,8 @@ export function ProblemDetail() {
                   <span className="text-gray-500">
                     {Math.floor(review.timeSpent / 60)}m {review.timeSpent % 60}s
                   </span>
-                  <span
-                    className={`font-mono font-medium ${
-                      review.quality >= 4
-                        ? 'text-green-400'
-                        : review.quality >= 3
-                        ? 'text-amber-400'
-                        : 'text-red-400'
-                    }`}
-                  >
-                    Q{review.quality * 2}
+                  <span className={`font-medium ${getQualityColor(review.quality)}`}>
+                    {getQualityLabel(review.quality)}
                   </span>
                 </div>
               </div>

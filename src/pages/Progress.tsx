@@ -296,7 +296,7 @@ export function Progress() {
                     </div>
                     {data.reviews > 0 && (
                       <div className="text-sm font-mono text-gray-400 w-12 text-right shrink-0">
-                        Q{(data.avgQuality * 2).toFixed(1)}
+                        {(data.avgQuality * 2).toFixed(1)}/10
                       </div>
                     )}
                   </div>

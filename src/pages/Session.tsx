@@ -21,6 +21,7 @@ import { HintLadder } from '../components/HintLadder';
 import { DifficultyBadge } from '../components/DifficultyBadge';
 import { PatternTag } from '../components/PatternTag';
 import { PatternSpoiler } from '../components/PatternSpoiler';
+import { ratingDescriptions, getQualityLabel, getQualityColor } from '../engine/quality';
 
 type SessionPhase = 'config' | 'solving' | 'rating' | 'insight' | 'complexity' | 'summary';
 
@@ -380,7 +381,7 @@ export function Session() {
                 </div>
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <span>{Math.floor(timeSpent / 60)}m</span>
-                  <span className="font-mono">Q{quality * 2}</span>
+                  <span className={`font-medium ${getQualityColor(quality)}`}>{getQualityLabel(quality)}</span>
                 </div>
               </div>
             ))}
@@ -535,28 +536,10 @@ export function Session() {
 
         {/* Rating Phase */}
         {phase === 'rating' && (
-          <div className="space-y-4 pt-4 border-t border-gray-800">
-            <p className="text-gray-300 font-medium">
-              {solvedCorrectly
-                ? 'How well did you solve it?'
-                : 'How much did you understand?'}
-            </p>
-            <div className="grid grid-cols-3 gap-3">
-              {solvedCorrectly ? (
-                <>
-                  <RatingButton quality={3} label="With difficulty" sublabel="Needed hints or took long" onClick={() => handleRatingComplete(3)} />
-                  <RatingButton quality={4} label="Minor hesitation" sublabel="Some recall effort" onClick={() => handleRatingComplete(4)} />
-                  <RatingButton quality={5} label="Perfect recall" sublabel="Knew it immediately" onClick={() => handleRatingComplete(5)} />
-                </>
-              ) : (
-                <>
-                  <RatingButton quality={0} label="Complete blank" sublabel="No idea where to start" onClick={() => handleRatingComplete(0)} />
-                  <RatingButton quality={1} label="Recognized pattern" sublabel="After seeing solution" onClick={() => handleRatingComplete(1)} />
-                  <RatingButton quality={2} label="Knew approach" sublabel="But couldn't implement" onClick={() => handleRatingComplete(2)} />
-                </>
-              )}
-            </div>
-          </div>
+          <RatingScale
+            solvedCorrectly={solvedCorrectly!}
+            onRate={(internalQuality) => handleRatingComplete(internalQuality)}
+          />
         )}
 
         {/* Insight Phase */}
@@ -633,32 +616,97 @@ export function Session() {
   );
 }
 
-function RatingButton({
-  quality,
-  label,
-  sublabel,
-  onClick,
+
+function RatingScale({
+  solvedCorrectly,
+  onRate,
 }: {
-  quality: number;
-  label: string;
-  sublabel: string;
-  onClick: () => void;
+  solvedCorrectly: boolean;
+  onRate: (internalQuality: number) => void;
 }) {
-  const colors =
-    quality <= 1
-      ? 'border-red-800 hover:bg-red-950/50'
-      : quality <= 3
-      ? 'border-amber-800 hover:bg-amber-950/50'
-      : 'border-green-800 hover:bg-green-950/50';
+  const [hovered, setHovered] = useState<number | null>(null);
+  const [selected, setSelected] = useState<number | null>(null);
+
+  const activeScore = hovered ?? selected;
+  const activeInfo = activeScore ? ratingDescriptions[activeScore] : null;
+
+  const handleConfirm = () => {
+    if (selected === null) return;
+    // Convert 1-10 display scale to 0-5 internal SM-2 quality
+    const internalQuality = Math.round((selected / 10) * 5);
+    onRate(internalQuality);
+  };
 
   return (
-    <button
-      onClick={onClick}
-      className={`p-4 rounded-lg border bg-gray-950 ${colors} transition-colors text-left`}
-    >
-      <p className="font-medium text-gray-200 text-sm">{label}</p>
-      <p className="text-xs text-gray-500 mt-0.5">{sublabel}</p>
-    </button>
+    <div className="space-y-4 pt-4 border-t border-gray-800">
+      <p className="text-gray-300 font-medium">
+        {solvedCorrectly
+          ? 'How well did you solve it?'
+          : 'How much did you understand?'}
+      </p>
+
+      {/* 1-10 buttons */}
+      <div className="flex gap-1.5">
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => {
+          const isSelected = selected === score;
+          const isHovered = hovered === score;
+          const color =
+            score <= 3
+              ? isSelected || isHovered
+                ? 'bg-red-600 border-red-500 text-white'
+                : 'border-red-900 text-red-400 hover:bg-red-950'
+              : score <= 5
+              ? isSelected || isHovered
+                ? 'bg-amber-600 border-amber-500 text-white'
+                : 'border-amber-900 text-amber-400 hover:bg-amber-950'
+              : score <= 7
+              ? isSelected || isHovered
+                ? 'bg-blue-600 border-blue-500 text-white'
+                : 'border-blue-900 text-blue-400 hover:bg-blue-950'
+              : isSelected || isHovered
+              ? 'bg-green-600 border-green-500 text-white'
+              : 'border-green-900 text-green-400 hover:bg-green-950';
+
+          return (
+            <button
+              key={score}
+              onClick={() => setSelected(score)}
+              onMouseEnter={() => setHovered(score)}
+              onMouseLeave={() => setHovered(null)}
+              className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${color}`}
+            >
+              {score}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Description */}
+      <div className="h-12 flex items-center">
+        {activeInfo ? (
+          <div>
+            <p className="text-sm font-medium text-gray-200">{activeInfo.label}</p>
+            <p className="text-xs text-gray-500">{activeInfo.description}</p>
+          </div>
+        ) : (
+          <p className="text-sm text-gray-600">Select a score from 1-10</p>
+        )}
+      </div>
+
+      {/* Confirm */}
+      <button
+        onClick={handleConfirm}
+        disabled={selected === null}
+        className={`w-full flex items-center justify-center gap-2 font-medium px-6 py-3 rounded-lg transition-colors ${
+          selected !== null
+            ? 'bg-blue-600 hover:bg-blue-500 text-white'
+            : 'bg-gray-800 text-gray-600 cursor-not-allowed'
+        }`}
+      >
+        <ChevronRight size={18} />
+        Confirm Rating
+      </button>
+    </div>
   );
 }
 
