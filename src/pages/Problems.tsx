@@ -5,6 +5,7 @@ import { problems } from '../data/problems';
 import { getAllProgress } from '../engine/storage';
 import { DifficultyBadge } from '../components/DifficultyBadge';
 import { PatternTag } from '../components/PatternTag';
+import { PatternSpoiler } from '../components/PatternSpoiler';
 import { MasteryIndicator } from '../components/MasteryIndicator';
 import { getAllPatterns } from '../engine/session-generator';
 
@@ -177,11 +178,7 @@ export function Problems() {
                       <DifficultyBadge difficulty={problem.difficulty} />
                       <MasteryIndicator progress={progress} />
                     </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {problem.patterns.map((p) => (
-                        <PatternTag key={p} pattern={p} />
-                      ))}
-                    </div>
+                    <PatternSpoiler patterns={problem.patterns} />
                   </div>
                 </div>
                 <a

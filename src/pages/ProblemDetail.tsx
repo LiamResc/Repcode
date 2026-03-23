@@ -16,6 +16,7 @@ import { getProgress, getAllProgress } from '../engine/storage';
 import { getMasteryLevel } from '../engine/spaced-repetition';
 import { DifficultyBadge } from '../components/DifficultyBadge';
 import { PatternTag } from '../components/PatternTag';
+import { PatternSpoiler } from '../components/PatternSpoiler';
 import { MasteryIndicator } from '../components/MasteryIndicator';
 import { formatDistanceToNow, format } from 'date-fns';
 
@@ -80,9 +81,7 @@ export function ProblemDetail() {
             <div className="flex items-center gap-2 flex-wrap mb-4">
               <DifficultyBadge difficulty={problem.difficulty} size="md" />
               <MasteryIndicator progress={progress} size="md" />
-              {problem.patterns.map((p) => (
-                <PatternTag key={p} pattern={p} size="md" />
-              ))}
+              <PatternSpoiler patterns={problem.patterns} size="md" />
             </div>
             <p className="text-gray-300">{problem.description}</p>
           </div>
