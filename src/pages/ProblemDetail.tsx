@@ -108,9 +108,9 @@ export function ProblemDetail() {
         <MiniStat
           icon={<TrendingUp size={16} />}
           label="Avg Quality"
-          value={reviews.length > 0 ? avgQuality.toFixed(1) : '—'}
+          value={reviews.length > 0 ? (avgQuality * 2).toFixed(1) + '/10' : '—'}
           color="text-purple-400"
-          trend={qualityTrend}
+          trend={qualityTrend !== 0 ? qualityTrend * 2 : 0}
         />
         <MiniStat
           icon={<Clock size={16} />}
@@ -149,9 +149,9 @@ export function ProblemDetail() {
               </p>
             </div>
             <div className="p-3 rounded-lg bg-gray-950 border border-gray-800">
-              <p className="text-xs text-gray-500 mb-1">Ease Factor</p>
+              <p className="text-xs text-gray-500 mb-1">Mastery Score</p>
               <p className="text-lg font-bold text-gray-200">
-                {progress.easeFactor.toFixed(2)}
+                {Math.min(10, ((progress.easeFactor - 1.3) / (2.5 - 1.3)) * 6 + (progress.repetitions > 0 ? Math.min(4, progress.interval / 7) : 0)).toFixed(1)}/10
               </p>
             </div>
             <div className="p-3 rounded-lg bg-gray-950 border border-gray-800">
@@ -235,7 +235,7 @@ export function ProblemDetail() {
                         : 'text-red-400'
                     }`}
                   >
-                    Q{review.quality}
+                    Q{review.quality * 2}
                   </span>
                 </div>
               </div>

@@ -351,7 +351,7 @@ export function Session() {
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center p-4 rounded-lg bg-gray-950 border border-gray-800">
               <p className="text-2xl font-bold text-gray-100">
-                {avgQuality.toFixed(1)}
+                {(avgQuality * 2).toFixed(1)}/10
               </p>
               <p className="text-sm text-gray-500">Avg Quality</p>
             </div>
@@ -380,7 +380,7 @@ export function Session() {
                 </div>
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <span>{Math.floor(timeSpent / 60)}m</span>
-                  <span className="font-mono">Q{quality}</span>
+                  <span className="font-mono">Q{quality * 2}</span>
                 </div>
               </div>
             ))}

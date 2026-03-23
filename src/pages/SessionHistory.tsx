@@ -70,7 +70,7 @@ export function SessionHistory() {
         </div>
         <div className="card text-center py-4">
           <p className="text-2xl font-bold text-gray-100">
-            {overallAvgQuality.toFixed(1)}
+            {(overallAvgQuality * 2).toFixed(1)}/10
           </p>
           <p className="text-sm text-gray-500">Avg Quality</p>
         </div>
@@ -120,7 +120,7 @@ export function SessionHistory() {
                   </div>
                   <div className="flex items-center gap-1.5 text-gray-400">
                     <TrendingUp size={14} />
-                    Q{session.avgQuality.toFixed(1)}
+                    Q{(session.avgQuality * 2).toFixed(1)}
                   </div>
                 </div>
               </div>
@@ -167,7 +167,7 @@ export function SessionHistory() {
                               : 'text-red-400'
                           }`}
                         >
-                          Q{sp.quality}
+                          Q{sp.quality * 2}
                         </span>
                       </div>
                     </div>

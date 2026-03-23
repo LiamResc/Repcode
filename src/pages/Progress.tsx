@@ -140,7 +140,7 @@ export function Progress() {
             </div>
             <div className="card text-center">
               <TrendingUp size={20} className="mx-auto text-purple-400 mb-2" />
-              <p className="text-2xl font-bold">{stats.avgQuality.toFixed(1)}</p>
+              <p className="text-2xl font-bold">{(stats.avgQuality * 2).toFixed(1)}/10</p>
               <p className="text-sm text-gray-500">Avg Quality Score</p>
             </div>
             <div className="card text-center">
@@ -296,7 +296,7 @@ export function Progress() {
                     </div>
                     {data.reviews > 0 && (
                       <div className="text-sm font-mono text-gray-400 w-12 text-right shrink-0">
-                        Q{data.avgQuality.toFixed(1)}
+                        Q{(data.avgQuality * 2).toFixed(1)}
                       </div>
                     )}
                   </div>

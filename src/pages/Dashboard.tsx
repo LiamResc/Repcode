@@ -186,7 +186,7 @@ export function Dashboard() {
                       />
                     </div>
                     <span className="text-sm text-gray-400 font-mono w-8">
-                      {avgQuality.toFixed(1)}
+                      {(avgQuality * 2).toFixed(1)}
                     </span>
                   </div>
                 </div>
