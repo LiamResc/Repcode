@@ -294,11 +294,9 @@ export function Progress() {
                     <div className="text-sm text-gray-500 w-20 text-right shrink-0">
                       {data.mastered}/{data.total}
                     </div>
-                    {data.reviews > 0 && (
-                      <div className="text-sm font-mono text-gray-400 w-12 text-right shrink-0">
-                        {(data.avgQuality * 2).toFixed(1)}/10
-                      </div>
-                    )}
+                    <div className="text-sm font-mono text-gray-400 w-16 text-right shrink-0">
+                      {data.reviews > 0 ? `${(data.avgQuality * 2).toFixed(1)}/10` : '—/10'}
+                    </div>
                   </div>
                 ))}
             </div>
