@@ -236,7 +236,7 @@ export function Progress() {
               </div>
             ) : (
               <>
-                <div className="flex gap-1 items-end h-24">
+                <div className="flex gap-1 h-24">
                   {stats.last30Days.map(({ date, count }) => {
                     const maxCount = Math.max(
                       ...stats.last30Days.map((d) => d.count),
@@ -246,7 +246,7 @@ export function Progress() {
                     return (
                       <div
                         key={date}
-                        className="flex-1 group relative"
+                        className="flex-1 group relative flex flex-col justify-end"
                         title={`${date}: ${count} reviews`}
                       >
                         <div
