@@ -242,7 +242,7 @@ export function Progress() {
                       ...stats.last30Days.map((d) => d.count),
                       1
                     );
-                    const height = count > 0 ? Math.max(20, (count / maxCount) * 100) : 4;
+                    const height = count > 0 ? Math.max(30, (count / maxCount) * 100) : 8;
                     return (
                       <div
                         key={date}
@@ -252,12 +252,12 @@ export function Progress() {
                         <div
                           className={`w-full rounded-sm transition-all ${
                             count === 0
-                              ? 'bg-gray-800'
+                              ? 'bg-gray-800/50'
                               : count <= 2
-                              ? 'bg-blue-900'
+                              ? 'bg-blue-600'
                               : count <= 5
-                              ? 'bg-blue-700'
-                              : 'bg-blue-500'
+                              ? 'bg-blue-500'
+                              : 'bg-blue-400'
                           }`}
                           style={{ height: `${height}%` }}
                         />
