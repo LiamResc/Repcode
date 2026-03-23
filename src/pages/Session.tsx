@@ -37,6 +37,7 @@ export function Session() {
   const [insight, setInsight] = useState('');
   const [timeComplexity, setTimeComplexity] = useState('');
   const [spaceComplexity, setSpaceComplexity] = useState('');
+  const [complexityChecked, setComplexityChecked] = useState(false);
   const [results, setResults] = useState<
     { problem: SessionProblem; quality: number; timeSpent: number; hintsUsed: number }[]
   >([]);
@@ -142,6 +143,7 @@ export function Session() {
       setInsight('');
       setTimeComplexity('');
       setSpaceComplexity('');
+      setComplexityChecked(false);
       startTimeRef.current = Date.now();
     } else {
       // Save session record
@@ -572,7 +574,12 @@ export function Session() {
         )}
 
         {/* Complexity Analysis */}
-        {phase === 'complexity' && (
+        {phase === 'complexity' && (() => {
+          const currentProblem = sessionProblems[currentIndex].problem;
+          const timeCorrect = complexityChecked && normalizeComplexity(timeComplexity) === normalizeComplexity(currentProblem.timeComplexity);
+          const spaceCorrect = complexityChecked && normalizeComplexity(spaceComplexity) === normalizeComplexity(currentProblem.spaceComplexity);
+
+          return (
           <div className="space-y-4 pt-4 border-t border-gray-800">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -587,18 +594,40 @@ export function Session() {
                   <label className="block text-xs text-gray-500 mb-1.5">Time Complexity</label>
                   <ComplexitySelector
                     value={timeComplexity}
-                    onChange={setTimeComplexity}
+                    onChange={(v) => { setTimeComplexity(v); setComplexityChecked(false); }}
                   />
+                  {complexityChecked && (
+                    <div className={`flex items-center gap-1.5 mt-1.5 text-sm ${timeCorrect ? 'text-green-400' : 'text-red-400'}`}>
+                      {timeCorrect ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
+                      {timeCorrect ? 'Correct!' : `Expected: ${currentProblem.timeComplexity}`}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1.5">Space Complexity</label>
                   <ComplexitySelector
                     value={spaceComplexity}
-                    onChange={setSpaceComplexity}
+                    onChange={(v) => { setSpaceComplexity(v); setComplexityChecked(false); }}
                   />
+                  {complexityChecked && (
+                    <div className={`flex items-center gap-1.5 mt-1.5 text-sm ${spaceCorrect ? 'text-green-400' : 'text-red-400'}`}>
+                      {spaceCorrect ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
+                      {spaceCorrect ? 'Correct!' : `Expected: ${currentProblem.spaceComplexity}`}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
+
+            {!complexityChecked ? (
+              <button
+                onClick={() => setComplexityChecked(true)}
+                disabled={!timeComplexity && !spaceComplexity}
+                className="btn-secondary w-full flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Check Answer
+              </button>
+            ) : null}
 
             <button
               onClick={submitReview}
@@ -610,7 +639,8 @@ export function Session() {
                 : 'Finish Session'}
             </button>
           </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );
@@ -714,6 +744,20 @@ function QualityIcon({ quality }: { quality: number }) {
   if (quality >= 4) return <CheckCircle2 size={18} className="text-green-500" />;
   if (quality >= 3) return <CheckCircle2 size={18} className="text-amber-500" />;
   return <XCircle size={18} className="text-red-500" />;
+}
+
+/** Normalize complexity strings for comparison (e.g. "O(n^2)" === "O(n²)") */
+function normalizeComplexity(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/\^2/g, '²')
+    .replace(/\^3/g, '³')
+    .replace(/[\*x×]/g, '×')
+    .replace('2^n', '2ⁿ')
+    .replace('^n', 'ⁿ')
+    .replace('^t', 'ᵗ')
+    .replace('^l', 'ˡ');
 }
 
 const commonComplexities = [

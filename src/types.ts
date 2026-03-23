@@ -9,6 +9,8 @@ export interface Problem {
   hints: [string, string, string, string];
   keyInsight: string;
   relatedProblems?: number[]; // ids of related problems (easier → harder progression)
+  timeComplexity: string; // e.g. "O(n)", "O(n log n)"
+  spaceComplexity: string; // e.g. "O(1)", "O(n)"
 }
 
 export interface ReviewEntry {

@@ -18,6 +18,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Use a hash map to store seen values and check for complements in a single pass — O(n) time, O(n) space.',
     relatedProblems: [3, 4],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(n)',
   },
   {
     id: 2,
@@ -35,6 +37,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Two pointers from both ends, skip non-alphanumeric, compare lowercase — O(n) time, O(1) space.',
     relatedProblems: [4],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 3,
@@ -52,6 +56,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Sort + fix one element + two-pointer search for the other two. Skip duplicates by checking adjacent values.',
     relatedProblems: [1, 4, 5],
+    timeComplexity: 'O(n²)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 4,
@@ -69,6 +75,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Greedy two-pointer: start wide, always move the shorter side inward because keeping it can only decrease area.',
     relatedProblems: [3, 5],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 5,
@@ -86,6 +94,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Water at position i = min(leftMax, rightMax) - height[i]. Two pointers eliminate the need for precomputed arrays.',
     relatedProblems: [4, 17],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1)',
   },
 
   // ===== SLIDING WINDOW =====
@@ -105,6 +115,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Track minimum price so far and maximum profit at each step — a single-pass greedy approach.',
     relatedProblems: [7, 40],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 7,
@@ -122,6 +134,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Sliding window with a hash map tracking character positions — expand right, jump left past duplicates.',
     relatedProblems: [6, 8, 9],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(min(n, m))',
   },
   {
     id: 8,
@@ -139,6 +153,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Window is valid when (windowSize - maxFreqInWindow) <= k. The maxFreq only needs to increase, never decrease.',
     relatedProblems: [7, 9],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 9,
@@ -156,6 +172,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Two-pointer sliding window: expand right until valid, then shrink left to minimize. Track character count satisfaction.',
     relatedProblems: [7, 8],
+    timeComplexity: 'O(n + m)',
+    spaceComplexity: 'O(n + m)',
   },
 
   // ===== BINARY SEARCH =====
@@ -175,6 +193,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Classic binary search: compare mid element, narrow to left or right half. O(log n) time.',
     relatedProblems: [11, 12, 13],
+    timeComplexity: 'O(log n)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 11,
@@ -192,6 +212,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'In a rotated sorted array, one half is always properly sorted. Use that to decide which half to search.',
     relatedProblems: [10, 12],
+    timeComplexity: 'O(log n)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 12,
@@ -209,6 +231,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Compare mid with right boundary: if mid > right, min is in right half; otherwise in left half (including mid).',
     relatedProblems: [10, 11, 13],
+    timeComplexity: 'O(log n)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 13,
@@ -226,6 +250,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Binary search on the answer space, not the input array. Check feasibility of each candidate speed.',
     relatedProblems: [10, 12],
+    timeComplexity: 'O(n log m)',
+    spaceComplexity: 'O(1)',
   },
 
   // ===== STACK =====
@@ -245,6 +271,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Stack for matching: push opens, pop and match on closes. Valid if stack is empty at the end.',
     relatedProblems: [15, 16],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(n)',
   },
   {
     id: 15,
@@ -262,6 +290,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Store the running minimum alongside each element. Each push records min(newVal, previousMin).',
     relatedProblems: [14, 16],
+    timeComplexity: 'O(1)',
+    spaceComplexity: 'O(n)',
   },
   {
     id: 16,
@@ -279,6 +309,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Monotonic decreasing stack of indices. When you find a warmer day, pop all cooler days and record distances.',
     relatedProblems: [15, 17],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(n)',
   },
   {
     id: 17,
@@ -296,6 +328,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Monotonic increasing stack. When a shorter bar is found, pop and compute area using the popped height and width between current boundaries.',
     relatedProblems: [16, 5],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(n)',
   },
 
   // ===== LINKED LIST =====
@@ -315,6 +349,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Iterative reversal with three pointers (prev, curr, next). Process each node by redirecting its next pointer.',
     relatedProblems: [19, 20],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 19,
@@ -332,6 +368,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Dummy head node + comparison loop. Always attach the smaller node and advance that list\'s pointer.',
     relatedProblems: [18, 45],
+    timeComplexity: 'O(n + m)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 20,
@@ -349,6 +387,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Floyd\'s tortoise and hare: slow (1 step) and fast (2 steps) pointers will meet inside the cycle if one exists.',
     relatedProblems: [18, 21],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 21,
@@ -366,6 +406,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Hash map + doubly-linked list. Map gives O(1) access, DLL gives O(1) reordering and eviction.',
     relatedProblems: [20, 19],
+    timeComplexity: 'O(1)',
+    spaceComplexity: 'O(n)',
   },
 
   // ===== TREES =====
@@ -385,6 +427,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Simple recursion: depth = 1 + max(leftDepth, rightDepth). Base case: null → 0.',
     relatedProblems: [23, 24, 25],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(h)',
   },
   {
     id: 23,
@@ -402,6 +446,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Recursive swap of left and right children at every node. Base case: null returns null.',
     relatedProblems: [22, 24],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(h)',
   },
   {
     id: 24,
@@ -419,6 +465,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'BFS with a queue. Process exactly queue.length nodes per level to group them. Add children for next level.',
     relatedProblems: [22, 25, 27],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(n)',
   },
   {
     id: 25,
@@ -436,6 +484,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Recursive validation with min/max bounds. Each recursive call narrows the valid range for the subtree.',
     relatedProblems: [24, 26],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(h)',
   },
   {
     id: 26,
@@ -453,6 +503,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'The LCA is the first node where p and q split to different subtrees (or one equals the node). Use BST ordering.',
     relatedProblems: [25, 27],
+    timeComplexity: 'O(h)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 27,
@@ -470,6 +522,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'DFS returns the max single-branch sum. At each node, update global max with left + right + node (the arch path).',
     relatedProblems: [24, 26],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(h)',
   },
 
   // ===== GRAPHS =====
@@ -489,6 +543,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Scan grid for unvisited land. Each DFS/BFS from new land discovers one complete island. Mark visited by modifying grid.',
     relatedProblems: [29, 30, 31],
+    timeComplexity: 'O(m × n)',
+    spaceComplexity: 'O(m × n)',
   },
   {
     id: 29,
@@ -506,6 +562,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'DFS/BFS with a visited map (original → clone). The map serves double duty: prevents cycles and provides O(1) lookups.',
     relatedProblems: [28, 30],
+    timeComplexity: 'O(V + E)',
+    spaceComplexity: 'O(V)',
   },
   {
     id: 30,
@@ -523,6 +581,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Topological sort / cycle detection. DFS with 3 states: visiting an "in-progress" node means cycle exists.',
     relatedProblems: [28, 29, 31],
+    timeComplexity: 'O(V + E)',
+    spaceComplexity: 'O(V + E)',
   },
   {
     id: 31,
@@ -540,6 +600,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Reverse the problem: BFS/DFS inward from each ocean\'s border. Intersection of reachable sets is the answer.',
     relatedProblems: [28, 30],
+    timeComplexity: 'O(m × n)',
+    spaceComplexity: 'O(m × n)',
   },
 
   // ===== DYNAMIC PROGRAMMING =====
@@ -559,6 +621,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Fibonacci sequence in disguise. dp[i] = dp[i-1] + dp[i-2]. Can optimize to O(1) space with two variables.',
     relatedProblems: [33, 38],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 33,
@@ -576,6 +640,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Classic pick/skip DP: dp[i] = max(skip: dp[i-1], rob: dp[i-2] + nums[i]). Only need last 2 values.',
     relatedProblems: [32, 34],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 34,
@@ -593,6 +659,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Bottom-up DP: dp[i] = 1 + min(dp[i - coin]) for all coins. Build solution from 0 to target amount.',
     relatedProblems: [33, 36],
+    timeComplexity: 'O(n × m)',
+    spaceComplexity: 'O(n)',
   },
   {
     id: 35,
@@ -610,6 +678,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'O(n²): dp[i] = max LIS ending at i. O(n log n): maintain sorted tails array, binary search insertion points.',
     relatedProblems: [37, 39],
+    timeComplexity: 'O(n log n)',
+    spaceComplexity: 'O(n)',
   },
   {
     id: 36,
@@ -627,6 +697,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'dp[i] = can s[0..i] be segmented? Check all split points j where dp[j] is true and s[j..i] is a word.',
     relatedProblems: [34, 47],
+    timeComplexity: 'O(n²)',
+    spaceComplexity: 'O(n)',
   },
   {
     id: 37,
@@ -644,6 +716,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: '2D DP: if chars match, extend diagonal. If not, take max of skipping either char. Classic subsequence pattern.',
     relatedProblems: [35, 39],
+    timeComplexity: 'O(m × n)',
+    spaceComplexity: 'O(m × n)',
   },
   {
     id: 38,
@@ -661,6 +735,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Grid DP: paths to cell = paths from above + paths from left. Can optimize to 1D array.',
     relatedProblems: [32, 39],
+    timeComplexity: 'O(m × n)',
+    spaceComplexity: 'O(m × n)',
   },
   {
     id: 39,
@@ -678,6 +754,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Classic 2D DP on two strings. Three operations map to three adjacent cells: left (insert), above (delete), diagonal (replace).',
     relatedProblems: [37, 38],
+    timeComplexity: 'O(m × n)',
+    spaceComplexity: 'O(m × n)',
   },
 
   // ===== GREEDY =====
@@ -697,6 +775,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Kadane\'s algorithm: running sum resets when it goes negative. Track the maximum sum seen at each step.',
     relatedProblems: [6, 41],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 41,
@@ -714,6 +794,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Greedy: track farthest reachable index. If you can reach position i, update maxReach. Stuck if i > maxReach.',
     relatedProblems: [40, 42],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 42,
@@ -731,6 +813,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Sort by start time. Scan linearly: merge if overlap (extend end), otherwise start new interval.',
     relatedProblems: [41, 53],
+    timeComplexity: 'O(n log n)',
+    spaceComplexity: 'O(n)',
   },
 
   // ===== HEAP =====
@@ -750,6 +834,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Count frequencies with hash map, then bucket sort by frequency. O(n) time — no heap needed.',
     relatedProblems: [44, 45],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(n)',
   },
   {
     id: 44,
@@ -767,6 +853,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Two heaps: max-heap for lower half, min-heap for upper half. Balanced heaps give O(1) median access.',
     relatedProblems: [43, 45],
+    timeComplexity: 'O(log n)',
+    spaceComplexity: 'O(n)',
   },
   {
     id: 45,
@@ -784,6 +872,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Min-heap of k list heads. Repeatedly pop the smallest and push its successor. O(n log k) total time.',
     relatedProblems: [19, 43, 44],
+    timeComplexity: 'O(n log k)',
+    spaceComplexity: 'O(k)',
   },
 
   // ===== BACKTRACKING =====
@@ -803,6 +893,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Backtracking decision tree: at each element, include or exclude. Record subset at every node (not just leaves).',
     relatedProblems: [47, 48],
+    timeComplexity: 'O(n × 2ⁿ)',
+    spaceComplexity: 'O(n × 2ⁿ)',
   },
   {
     id: 47,
@@ -820,6 +912,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Backtracking with reuse: pass same index (not i+1) to allow repeated use. Prune when remaining goes negative.',
     relatedProblems: [46, 36, 48],
+    timeComplexity: 'O(2^t)',
+    spaceComplexity: 'O(t)',
   },
   {
     id: 48,
@@ -837,6 +931,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Backtracking with a used set. At each position, try every unused number. Full permutation at leaf nodes.',
     relatedProblems: [46, 47, 49],
+    timeComplexity: 'O(n × n!)',
+    spaceComplexity: 'O(n × n!)',
   },
   {
     id: 49,
@@ -854,6 +950,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'DFS backtracking on a grid. Mark visited cells temporarily (modify grid), restore on backtrack to allow other paths.',
     relatedProblems: [48, 50],
+    timeComplexity: 'O(m × n × 4^L)',
+    spaceComplexity: 'O(L)',
   },
 
   // ===== TRIE =====
@@ -873,6 +971,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Tree of characters. Each node has children map and end-of-word flag. All operations are O(word length).',
     relatedProblems: [49],
+    timeComplexity: 'O(L)',
+    spaceComplexity: 'O(n × L)',
   },
 
   // ===== BIT MANIPULATION =====
@@ -892,6 +992,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'n & (n-1) clears the lowest set bit. Count iterations until n becomes 0. O(number of set bits).',
     relatedProblems: [52],
+    timeComplexity: 'O(1)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 52,
@@ -909,6 +1011,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'DP relation: bits(n) = bits(n >> 1) + (n & 1). Each number\'s bit count builds on a previously computed value.',
     relatedProblems: [51],
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(n)',
   },
 
   // ===== INTERVALS =====
@@ -928,6 +1032,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Activity selection: sort by end time, greedily keep non-conflicting intervals. Removals = total - kept.',
     relatedProblems: [42],
+    timeComplexity: 'O(n log n)',
+    spaceComplexity: 'O(1)',
   },
 
   // ===== MATRIX =====
@@ -947,6 +1053,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Transpose + reverse each row = 90° clockwise rotation. Both operations are easy in-place.',
     relatedProblems: [55, 56],
+    timeComplexity: 'O(n²)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 55,
@@ -964,6 +1072,8 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Four boundaries (top, bottom, left, right) that shrink inward. Traverse each edge and adjust the boundary.',
     relatedProblems: [54, 56],
+    timeComplexity: 'O(m × n)',
+    spaceComplexity: 'O(1)',
   },
   {
     id: 56,
@@ -981,5 +1091,7 @@ export const problems: Problem[] = [
     ],
     keyInsight: 'Use the first row and column as flags for which rows/cols to zero. O(1) extra space with careful ordering.',
     relatedProblems: [54, 55],
+    timeComplexity: 'O(m × n)',
+    spaceComplexity: 'O(1)',
   },
 ];
