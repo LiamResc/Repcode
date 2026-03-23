@@ -20,6 +20,7 @@ import { PatternSpoiler } from '../components/PatternSpoiler';
 import { MasteryIndicator } from '../components/MasteryIndicator';
 import { formatDistanceToNow, format } from 'date-fns';
 import { getQualityLabel, getQualityColor } from '../engine/quality';
+import { toLocalDateString } from '../engine/date-utils';
 
 export function ProblemDetail() {
   const { id } = useParams<{ id: string }>();
@@ -322,7 +323,7 @@ export function ProblemDetail() {
 }
 
 function isToday(dateStr: string): boolean {
-  return dateStr === new Date().toISOString().split('T')[0];
+  return dateStr === toLocalDateString();
 }
 
 function MiniStat({

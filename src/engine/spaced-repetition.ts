@@ -1,4 +1,5 @@
 import { ProblemProgress, ReviewEntry } from '../types';
+import { toLocalDateString } from './date-utils';
 
 /**
  * SM-2 Spaced Repetition Algorithm
@@ -49,8 +50,8 @@ export function calculateNextReview(
     easeFactor,
     interval,
     repetitions,
-    nextReviewDate: nextReview.toISOString().split('T')[0],
-    lastReviewDate: now.toISOString().split('T')[0],
+    nextReviewDate: toLocalDateString(nextReview),
+    lastReviewDate: toLocalDateString(now),
   };
 }
 
@@ -78,14 +79,14 @@ export function createInitialProgress(problemId: number): ProblemProgress {
     easeFactor: 2.5,
     interval: 0,
     repetitions: 0,
-    nextReviewDate: new Date().toISOString().split('T')[0],
+    nextReviewDate: toLocalDateString(),
     lastReviewDate: '',
     history: [],
   };
 }
 
 export function isDue(progress: ProblemProgress): boolean {
-  const today = new Date().toISOString().split('T')[0];
+  const today = toLocalDateString();
   return progress.nextReviewDate <= today;
 }
 

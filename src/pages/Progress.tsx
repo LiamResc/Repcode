@@ -6,8 +6,10 @@ import {
   TrendingUp,
   Clock,
   Zap,
+  Calendar,
 } from 'lucide-react';
 import { problems } from '../data/problems';
+import { toLocalDateString } from '../engine/date-utils';
 import { getAllProgress } from '../engine/storage';
 import { getMasteryLevel, getAverageQuality } from '../engine/spaced-repetition';
 import { getAllPatterns, getWeakPatterns } from '../engine/session-generator';
@@ -93,7 +95,7 @@ export function Progress() {
     for (let i = 29; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
+      const dateStr = toLocalDateString(d);
       last30Days.push({ date: dateStr, count: reviewsByDate[dateStr] || 0 });
     }
 
@@ -226,42 +228,52 @@ export function Progress() {
           {/* Activity Heatmap */}
           <div className="card">
             <h2 className="text-lg font-semibold mb-4">Last 30 Days</h2>
-            <div className="flex gap-1 items-end h-24">
-              {stats.last30Days.map(({ date, count }) => {
-                const maxCount = Math.max(
-                  ...stats.last30Days.map((d) => d.count),
-                  1
-                );
-                const height = count > 0 ? Math.max(20, (count / maxCount) * 100) : 4;
-                return (
-                  <div
-                    key={date}
-                    className="flex-1 group relative"
-                    title={`${date}: ${count} reviews`}
-                  >
-                    <div
-                      className={`w-full rounded-sm transition-all ${
-                        count === 0
-                          ? 'bg-gray-800'
-                          : count <= 2
-                          ? 'bg-blue-900'
-                          : count <= 5
-                          ? 'bg-blue-700'
-                          : 'bg-blue-500'
-                      }`}
-                      style={{ height: `${height}%` }}
-                    />
-                    <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-800 text-xs text-gray-300 px-2 py-1 rounded whitespace-nowrap border border-gray-700 z-10">
-                      {date}: {count} review{count !== 1 ? 's' : ''}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="flex justify-between text-xs text-gray-600 mt-2">
-              <span>30 days ago</span>
-              <span>Today</span>
-            </div>
+            {stats.last30Days.every((d) => d.count === 0) ? (
+              <div className="text-center py-8 text-gray-500">
+                <Calendar size={32} className="mx-auto mb-2 opacity-50" />
+                <p>No reviews in the last 30 days</p>
+                <p className="text-sm mt-1">Complete a session to start tracking activity</p>
+              </div>
+            ) : (
+              <>
+                <div className="flex gap-1 items-end h-24">
+                  {stats.last30Days.map(({ date, count }) => {
+                    const maxCount = Math.max(
+                      ...stats.last30Days.map((d) => d.count),
+                      1
+                    );
+                    const height = count > 0 ? Math.max(20, (count / maxCount) * 100) : 4;
+                    return (
+                      <div
+                        key={date}
+                        className="flex-1 group relative"
+                        title={`${date}: ${count} reviews`}
+                      >
+                        <div
+                          className={`w-full rounded-sm transition-all ${
+                            count === 0
+                              ? 'bg-gray-800'
+                              : count <= 2
+                              ? 'bg-blue-900'
+                              : count <= 5
+                              ? 'bg-blue-700'
+                              : 'bg-blue-500'
+                          }`}
+                          style={{ height: `${height}%` }}
+                        />
+                        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-800 text-xs text-gray-300 px-2 py-1 rounded whitespace-nowrap border border-gray-700 z-10">
+                          {date}: {count} review{count !== 1 ? 's' : ''}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="flex justify-between text-xs text-gray-600 mt-2">
+                  <span>30 days ago</span>
+                  <span>Today</span>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Pattern Progress */}

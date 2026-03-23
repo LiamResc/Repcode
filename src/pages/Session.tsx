@@ -22,6 +22,7 @@ import { DifficultyBadge } from '../components/DifficultyBadge';
 import { PatternTag } from '../components/PatternTag';
 import { PatternSpoiler } from '../components/PatternSpoiler';
 import { ratingDescriptions, getQualityLabel, getQualityColor } from '../engine/quality';
+import { toLocalDateString } from '../engine/date-utils';
 
 type SessionPhase = 'config' | 'solving' | 'rating' | 'insight' | 'complexity' | 'summary';
 
@@ -118,7 +119,7 @@ export function Session() {
     const updatedProgress = calculateNextReview(progress, quality);
 
     const entry: ReviewEntry = {
-      date: new Date().toISOString().split('T')[0],
+      date: toLocalDateString(),
       quality,
       timeSpent,
       hintsUsed,

@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { toLocalDateString } from '../engine/date-utils';
 import {
   Download,
   Upload,
@@ -27,7 +28,7 @@ export function Settings() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `repcode-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `repcode-backup-${toLocalDateString()}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

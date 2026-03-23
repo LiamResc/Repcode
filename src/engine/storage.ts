@@ -1,4 +1,5 @@
 import { ProblemProgress, ReviewEntry, UserStats, SessionRecord } from '../types';
+import { toLocalDateString } from './date-utils';
 import { createInitialProgress } from './spaced-repetition';
 
 const STORAGE_KEYS = {
@@ -62,7 +63,7 @@ function saveStats(stats: UserStats): void {
 function updateStatsAfterReview(): void {
   const stats = getStats();
   const allProgress = getAllProgress();
-  const today = new Date().toISOString().split('T')[0];
+  const today = toLocalDateString();
 
   stats.totalReviews += 1;
 
