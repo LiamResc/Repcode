@@ -11,41 +11,51 @@ export function Timer({ minutes, onTimeUp, onTick }: TimerProps) {
   const totalSeconds = minutes * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const [isRunning, setIsRunning] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const elapsedRef = useRef(0);
+  const startedAtRef = useRef<number | null>(null);
+  const pausedRemainingRef = useRef(totalSeconds);
+  const timeUpFiredRef = useRef(false);
 
   const stop = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+    if (startedAtRef.current !== null) {
+      const elapsed = (Date.now() - startedAtRef.current) / 1000;
+      pausedRemainingRef.current = Math.max(0, pausedRemainingRef.current - elapsed);
     }
+    startedAtRef.current = null;
     setIsRunning(false);
   }, []);
 
+  // Tick using real clock time
   useEffect(() => {
-    if (secondsLeft <= 0 && isRunning) {
-      stop();
-      onTimeUp?.();
-    }
-  }, [secondsLeft, isRunning, stop, onTimeUp]);
+    if (!isRunning) return;
 
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+    const tick = () => {
+      if (startedAtRef.current === null) return;
+      const elapsed = (Date.now() - startedAtRef.current) / 1000;
+      const remaining = Math.max(0, pausedRemainingRef.current - elapsed);
+      setSecondsLeft(Math.ceil(remaining));
+
+      const totalElapsed = totalSeconds - remaining;
+      onTick?.(Math.floor(totalElapsed));
+
+      if (remaining <= 0 && !timeUpFiredRef.current) {
+        timeUpFiredRef.current = true;
+        setIsRunning(false);
+        startedAtRef.current = null;
+        pausedRemainingRef.current = 0;
+        onTimeUp?.();
+      }
     };
-  }, []);
+
+    tick();
+    const id = setInterval(tick, 250); // check frequently to catch up after tab switch
+    return () => clearInterval(id);
+  }, [isRunning, totalSeconds, onTick, onTimeUp]);
 
   const start = () => {
-    if (secondsLeft <= 0) return;
+    if (pausedRemainingRef.current <= 0) return;
+    startedAtRef.current = Date.now();
+    timeUpFiredRef.current = false;
     setIsRunning(true);
-    intervalRef.current = setInterval(() => {
-      setSecondsLeft((prev) => {
-        const next = prev - 1;
-        elapsedRef.current += 1;
-        onTick?.(elapsedRef.current);
-        return next;
-      });
-    }, 1000);
   };
 
   const toggle = () => {
@@ -58,8 +68,10 @@ export function Timer({ minutes, onTimeUp, onTick }: TimerProps) {
 
   const reset = () => {
     stop();
+    pausedRemainingRef.current = totalSeconds;
+    startedAtRef.current = null;
+    timeUpFiredRef.current = false;
     setSecondsLeft(totalSeconds);
-    elapsedRef.current = 0;
   };
 
   const mins = Math.floor(secondsLeft / 60);
@@ -92,7 +104,7 @@ export function Timer({ minutes, onTimeUp, onTick }: TimerProps) {
             strokeDasharray={`${2 * Math.PI * 28}`}
             strokeDashoffset={`${2 * Math.PI * 28 * (1 - progress / 100)}`}
             strokeLinecap="round"
-            className={`transition-all duration-1000 ${
+            className={`transition-all duration-500 ${
               isDanger
                 ? 'text-red-500'
                 : isWarning
@@ -136,8 +148,4 @@ export function Timer({ minutes, onTimeUp, onTick }: TimerProps) {
       </div>
     </div>
   );
-}
-
-export function getElapsedSeconds(startTime: number): number {
-  return Math.floor((Date.now() - startTime) / 1000);
 }
