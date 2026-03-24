@@ -1,22 +1,36 @@
-import { Problem, ProblemProgress, SessionConfig, SessionProblem } from '../types';
-import { isDue, isOverdue, getMasteryLevel, getAverageQuality } from './spaced-repetition';
-import { getAllProgress, getOrCreateProgress } from './storage';
+import { Problem, SessionConfig, SessionProblem } from '../types';
+import { isDue, isOverdue } from './spaced-repetition';
+import { getAllProgress } from './storage';
+import { toLocalDateString } from './date-utils';
+
+/** Minimum days after last review before a problem can appear again */
+const COOLDOWN_DAYS = 2;
+
+/**
+ * Weights for weighted random selection.
+ * Higher weight = more likely to be picked, but never guaranteed.
+ * Every non-empty category has a chance of being selected.
+ */
+const CATEGORY_WEIGHTS = {
+  overdue: 10,
+  due: 6,
+  weakness: 4,
+  new: 3,
+};
 
 export function generateSession(
   problems: Problem[],
   config: SessionConfig
 ): SessionProblem[] {
   const allProgress = getAllProgress();
-  const session: SessionProblem[] = [];
+  const today = new Date(toLocalDateString());
 
-  // 1. Collect overdue problems (highest priority)
-  const overdue: SessionProblem[] = [];
-  // 2. Collect due problems
-  const due: SessionProblem[] = [];
-  // 3. Collect weakness problems (low average quality)
-  const weaknesses: SessionProblem[] = [];
-  // 4. Collect new problems
-  const newProblems: SessionProblem[] = [];
+  const pools: Record<string, SessionProblem[]> = {
+    overdue: [],
+    due: [],
+    weakness: [],
+    new: [],
+  };
 
   for (const problem of problems) {
     // Apply filters
@@ -29,46 +43,80 @@ export function generateSession(
 
     const progress = allProgress[problem.id];
 
+    // New problem — never reviewed
     if (!progress || progress.history.length === 0) {
       if (config.includeNew) {
-        newProblems.push({ problem, reason: 'new' });
+        pools.new.push({ problem, reason: 'new' });
       }
       continue;
     }
 
-    if (isOverdue(progress)) {
-      overdue.push({ problem, reason: 'overdue' });
-    } else if (isDue(progress)) {
-      due.push({ problem, reason: 'due' });
+    // Cooldown: skip problems reviewed too recently
+    if (progress.lastReviewDate) {
+      const lastReview = new Date(progress.lastReviewDate);
+      const daysSince = Math.floor((today.getTime() - lastReview.getTime()) / (1000 * 60 * 60 * 24));
+      if (daysSince < COOLDOWN_DAYS) continue;
     }
 
-    // Weakness: has been reviewed but average quality is low
-    const avgQuality = getAverageQuality(progress);
-    if (avgQuality < 3 && progress.history.length >= 2) {
-      weaknesses.push({ problem, reason: 'weakness' });
+    // Categorize: overdue and due are mutually exclusive
+    if (isOverdue(progress)) {
+      pools.overdue.push({ problem, reason: 'overdue' });
+    } else if (isDue(progress)) {
+      pools.due.push({ problem, reason: 'due' });
+    }
+
+    // Weakness: use recent quality (last 3 reviews)
+    const recentHistory = progress.history.slice(-3);
+    const recentAvg = recentHistory.reduce((sum, r) => sum + r.quality, 0) / recentHistory.length;
+    if (recentAvg < 3 && progress.history.length >= 2) {
+      pools.weakness.push({ problem, reason: 'weakness' });
     }
   }
 
-  // Shuffle each category for variety
-  shuffle(overdue);
-  shuffle(due);
-  shuffle(weaknesses);
-  shuffle(newProblems);
+  // Shuffle each pool
+  for (const key of Object.keys(pools)) {
+    shuffle(pools[key]);
+  }
 
-  // Build session: prioritize overdue > due > weakness > new
-  const addToSession = (items: SessionProblem[]) => {
-    for (const item of items) {
-      if (session.length >= config.maxProblems) return;
-      if (!session.some((s) => s.problem.id === item.problem.id)) {
-        session.push(item);
+  // Weighted random selection across all categories
+  const session: SessionProblem[] = [];
+  const used = new Set<number>();
+
+  while (session.length < config.maxProblems) {
+    // Build weighted list of non-empty pools (excluding already-used problems)
+    const available: { key: string; weight: number }[] = [];
+    for (const [key, pool] of Object.entries(pools)) {
+      if (key === 'new' && !config.includeNew) continue;
+      // Check if pool has any unused problems left
+      if (pool.some((p) => !used.has(p.problem.id))) {
+        available.push({ key, weight: CATEGORY_WEIGHTS[key as keyof typeof CATEGORY_WEIGHTS] });
       }
     }
-  };
 
-  addToSession(overdue);
-  addToSession(due);
-  addToSession(weaknesses);
-  addToSession(newProblems);
+    // No more problems available
+    if (available.length === 0) break;
+
+    // Weighted random pick of category
+    const totalWeight = available.reduce((sum, a) => sum + a.weight, 0);
+    let roll = Math.random() * totalWeight;
+    let chosenKey = available[0].key;
+    for (const { key, weight } of available) {
+      roll -= weight;
+      if (roll <= 0) {
+        chosenKey = key;
+        break;
+      }
+    }
+
+    // Pick the next unused problem from that pool
+    const pool = pools[chosenKey];
+    const idx = pool.findIndex((p) => !used.has(p.problem.id));
+    if (idx !== -1) {
+      const picked = pool[idx];
+      session.push(picked);
+      used.add(picked.problem.id);
+    }
+  }
 
   // Interleave by pattern to avoid consecutive same-pattern problems
   return interleaveByPattern(session);
