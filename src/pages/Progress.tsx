@@ -6,7 +6,6 @@ import {
   TrendingUp,
   Clock,
   Zap,
-  Calendar,
 } from 'lucide-react';
 import { problems } from '../data/problems';
 import { toLocalDateString } from '../engine/date-utils';
@@ -90,13 +89,29 @@ export function Progress() {
       }
     }
 
-    // Activity heatmap data (last 30 days)
-    const last30Days: { date: string; count: number }[] = [];
-    for (let i = 29; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
+    // Activity heatmap data (last 365 days, grouped into weeks)
+    // Build grid: each column is a week, each row is a day (0=Sun, 6=Sat)
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0=Sun
+    // Go back to fill 52 full weeks + partial current week
+    const totalDays = 52 * 7 + dayOfWeek + 1;
+    const startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - totalDays + 1);
+
+    const heatmapData: { date: string; count: number; day: number; week: number }[] = [];
+    let maxDayCount = 0;
+    for (let i = 0; i < totalDays; i++) {
+      const d = new Date(startDate);
+      d.setDate(d.getDate() + i);
       const dateStr = toLocalDateString(d);
-      last30Days.push({ date: dateStr, count: reviewsByDate[dateStr] || 0 });
+      const count = reviewsByDate[dateStr] || 0;
+      if (count > maxDayCount) maxDayCount = count;
+      heatmapData.push({
+        date: dateStr,
+        count,
+        day: d.getDay(),
+        week: Math.floor(i / 7),
+      });
     }
 
     return {
@@ -105,7 +120,8 @@ export function Progress() {
       totalTime,
       avgQuality: totalQualityCount > 0 ? totalQualitySum / totalQualityCount : 0,
       patternProgress,
-      last30Days,
+      heatmapData,
+      maxDayCount,
     };
   }, [allProgress]);
 
@@ -227,53 +243,8 @@ export function Progress() {
 
           {/* Activity Heatmap */}
           <div className="card">
-            <h2 className="text-lg font-semibold mb-4">Last 30 Days</h2>
-            {stats.last30Days.every((d) => d.count === 0) ? (
-              <div className="text-center py-8 text-gray-500">
-                <Calendar size={32} className="mx-auto mb-2 opacity-50" />
-                <p>No reviews in the last 30 days</p>
-                <p className="text-sm mt-1">Complete a session to start tracking activity</p>
-              </div>
-            ) : (
-              <>
-                <div className="flex gap-1 h-24">
-                  {stats.last30Days.map(({ date, count }) => {
-                    const maxCount = Math.max(
-                      ...stats.last30Days.map((d) => d.count),
-                      1
-                    );
-                    const height = count > 0 ? Math.max(30, (count / maxCount) * 100) : 8;
-                    return (
-                      <div
-                        key={date}
-                        className="flex-1 group relative flex flex-col justify-end"
-                        title={`${date}: ${count} reviews`}
-                      >
-                        <div
-                          className={`w-full rounded-sm transition-all ${
-                            count === 0
-                              ? 'bg-gray-800/50'
-                              : count <= 2
-                              ? 'bg-blue-600'
-                              : count <= 5
-                              ? 'bg-blue-500'
-                              : 'bg-blue-400'
-                          }`}
-                          style={{ height: `${height}%` }}
-                        />
-                        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-800 text-xs text-gray-300 px-2 py-1 rounded whitespace-nowrap border border-gray-700 z-10">
-                          {date}: {count} review{count !== 1 ? 's' : ''}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="flex justify-between text-xs text-gray-600 mt-2">
-                  <span>30 days ago</span>
-                  <span>Today</span>
-                </div>
-              </>
-            )}
+            <h2 className="text-lg font-semibold mb-4">Activity</h2>
+            <ContributionHeatmap data={stats.heatmapData} maxCount={stats.maxDayCount} />
           </div>
 
           {/* Pattern Progress */}
@@ -315,6 +286,122 @@ export function Progress() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const DAYS = ['Sun', '', 'Tue', '', 'Thu', '', 'Sat'];
+
+function getHeatmapColor(count: number, maxCount: number): string {
+  if (count === 0) return 'bg-gray-800/40';
+  if (maxCount <= 0) return 'bg-green-900';
+  const ratio = count / maxCount;
+  if (ratio <= 0.25) return 'bg-green-900';
+  if (ratio <= 0.5) return 'bg-green-700';
+  if (ratio <= 0.75) return 'bg-green-500';
+  return 'bg-green-400';
+}
+
+function ContributionHeatmap({
+  data,
+  maxCount,
+}: {
+  data: { date: string; count: number; day: number; week: number }[];
+  maxCount: number;
+}) {
+  // Group by week
+  const weeks: { date: string; count: number; day: number }[][] = [];
+  for (const cell of data) {
+    if (!weeks[cell.week]) weeks[cell.week] = [];
+    weeks[cell.week].push(cell);
+  }
+
+  // Compute month labels: find the first week where a month starts
+  const monthLabels: { label: string; weekIdx: number }[] = [];
+  let lastMonth = -1;
+  for (const cell of data) {
+    const month = new Date(cell.date).getMonth();
+    if (month !== lastMonth && cell.day === 0) {
+      monthLabels.push({ label: MONTHS[month], weekIdx: cell.week });
+      lastMonth = month;
+    }
+  }
+
+  const totalReviews = data.reduce((sum, d) => sum + d.count, 0);
+  const activeDays = data.filter((d) => d.count > 0).length;
+
+  return (
+    <div>
+      {/* Month labels */}
+      <div className="flex ml-8 mb-1">
+        {monthLabels.map(({ label, weekIdx }, i) => {
+          const nextWeek = i < monthLabels.length - 1 ? monthLabels[i + 1].weekIdx : weeks.length;
+          const span = nextWeek - weekIdx;
+          return (
+            <span
+              key={`${label}-${weekIdx}`}
+              className="text-xs text-gray-500"
+              style={{ width: `${span * 14}px` }}
+            >
+              {label}
+            </span>
+          );
+        })}
+      </div>
+
+      <div className="flex gap-0">
+        {/* Day labels */}
+        <div className="flex flex-col gap-[3px] mr-1.5 shrink-0">
+          {DAYS.map((day, i) => (
+            <span key={i} className="text-xs text-gray-600 h-[11px] leading-[11px] w-6 text-right">
+              {day}
+            </span>
+          ))}
+        </div>
+
+        {/* Grid */}
+        <div className="flex gap-[3px] overflow-x-auto">
+          {weeks.map((week, wi) => (
+            <div key={wi} className="flex flex-col gap-[3px]">
+              {Array.from({ length: 7 }, (_, dayIdx) => {
+                const cell = week.find((c) => c.day === dayIdx);
+                if (!cell) {
+                  return <div key={dayIdx} className="w-[11px] h-[11px]" />;
+                }
+                return (
+                  <div
+                    key={dayIdx}
+                    className={`w-[11px] h-[11px] rounded-sm ${getHeatmapColor(cell.count, maxCount)} group relative`}
+                    title={`${cell.date}: ${cell.count} review${cell.count !== 1 ? 's' : ''}`}
+                  >
+                    <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-800 text-xs text-gray-300 px-2 py-1 rounded whitespace-nowrap border border-gray-700 z-10">
+                      {cell.count} review{cell.count !== 1 ? 's' : ''} on {cell.date}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center justify-between mt-3">
+        <span className="text-xs text-gray-500">
+          {totalReviews} review{totalReviews !== 1 ? 's' : ''} in the last year
+          {activeDays > 0 && ` · ${activeDays} active day${activeDays !== 1 ? 's' : ''}`}
+        </span>
+        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+          <span>Less</span>
+          <div className="w-[11px] h-[11px] rounded-sm bg-gray-800/40" />
+          <div className="w-[11px] h-[11px] rounded-sm bg-green-900" />
+          <div className="w-[11px] h-[11px] rounded-sm bg-green-700" />
+          <div className="w-[11px] h-[11px] rounded-sm bg-green-500" />
+          <div className="w-[11px] h-[11px] rounded-sm bg-green-400" />
+          <span>More</span>
+        </div>
+      </div>
     </div>
   );
 }
