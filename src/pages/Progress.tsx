@@ -242,7 +242,7 @@ export function Progress() {
           </div>
 
           {/* Activity Heatmap */}
-          <div className="card">
+          <div className="card overflow-visible">
             <h2 className="text-lg font-semibold mb-4">Activity</h2>
             <ContributionHeatmap data={stats.heatmapData} maxCount={stats.maxDayCount} />
           </div>
@@ -331,26 +331,30 @@ function ContributionHeatmap({
   const totalReviews = data.reduce((sum, d) => sum + d.count, 0);
   const activeDays = data.filter((d) => d.count > 0).length;
 
+  const totalWeeks = weeks.length;
+
   return (
-    <div>
+    <div className="overflow-visible">
       {/* Month labels */}
-      <div className="flex ml-8 mb-1">
-        {monthLabels.map(({ label, weekIdx }, i) => {
-          const nextWeek = i < monthLabels.length - 1 ? monthLabels[i + 1].weekIdx : weeks.length;
-          const span = nextWeek - weekIdx;
-          return (
-            <span
-              key={`${label}-${weekIdx}`}
-              className="text-xs text-gray-500"
-              style={{ width: `${span * 14}px` }}
-            >
-              {label}
-            </span>
-          );
-        })}
+      <div
+        className="grid mb-1"
+        style={{
+          marginLeft: '32px',
+          gridTemplateColumns: `repeat(${totalWeeks}, 1fr)`,
+        }}
+      >
+        {monthLabels.map(({ label, weekIdx }) => (
+          <span
+            key={`${label}-${weekIdx}`}
+            className="text-xs text-gray-500"
+            style={{ gridColumnStart: weekIdx + 1 }}
+          >
+            {label}
+          </span>
+        ))}
       </div>
 
-      <div className="flex gap-0">
+      <div className="flex">
         {/* Day labels */}
         <div className="flex flex-col gap-[3px] mr-1.5 shrink-0">
           {DAYS.map((day, i) => (
@@ -361,28 +365,37 @@ function ContributionHeatmap({
         </div>
 
         {/* Grid */}
-        <div className="flex gap-[3px] overflow-x-auto">
-          {weeks.map((week, wi) => (
-            <div key={wi} className="flex flex-col gap-[3px]">
-              {Array.from({ length: 7 }, (_, dayIdx) => {
-                const cell = week.find((c) => c.day === dayIdx);
-                if (!cell) {
-                  return <div key={dayIdx} className="w-[11px] h-[11px]" />;
-                }
+        <div
+          className="grid flex-1 gap-[3px]"
+          style={{
+            gridTemplateColumns: `repeat(${totalWeeks}, 1fr)`,
+            gridTemplateRows: 'repeat(7, 11px)',
+          }}
+        >
+          {weeks.flatMap((week, wi) =>
+            Array.from({ length: 7 }, (_, dayIdx) => {
+              const cell = week.find((c) => c.day === dayIdx);
+              if (!cell) {
                 return (
                   <div
-                    key={dayIdx}
-                    className={`w-[11px] h-[11px] rounded-sm ${getHeatmapColor(cell.count, maxCount)} group relative`}
-                    title={`${cell.date}: ${cell.count} review${cell.count !== 1 ? 's' : ''}`}
-                  >
-                    <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-800 text-xs text-gray-300 px-2 py-1 rounded whitespace-nowrap border border-gray-700 z-10">
-                      {cell.count} review{cell.count !== 1 ? 's' : ''} on {cell.date}
-                    </div>
-                  </div>
+                    key={`${wi}-${dayIdx}`}
+                    style={{ gridColumn: wi + 1, gridRow: dayIdx + 1 }}
+                  />
                 );
-              })}
-            </div>
-          ))}
+              }
+              return (
+                <div
+                  key={`${wi}-${dayIdx}`}
+                  className={`rounded-sm ${getHeatmapColor(cell.count, maxCount)} group relative`}
+                  style={{ gridColumn: wi + 1, gridRow: dayIdx + 1 }}
+                >
+                  <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-800 text-xs text-gray-300 px-2 py-1 rounded whitespace-nowrap border border-gray-700 z-20 pointer-events-none">
+                    {cell.count} review{cell.count !== 1 ? 's' : ''} on {cell.date}
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
 
