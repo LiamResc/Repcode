@@ -44,8 +44,9 @@ export function SessionHistory() {
     0
   );
   const totalTime = sessions.reduce((sum, s) => sum + s.totalTime, 0);
-  const overallAvgQuality =
-    sessions.reduce((sum, s) => sum + s.avgQuality, 0) / sessions.length;
+  const overallAvgQuality = totalProblemsReviewed > 0
+    ? sessions.reduce((sum, s) => sum + s.avgQuality * s.problems.length, 0) / totalProblemsReviewed
+    : 0;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
